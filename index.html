@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>봉담중 1학년 5반 청소 당번 뽑기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .draw-button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+
+        .draw-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .draw-button:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            margin-top: 30px;
+        }
+
+        .result-title {
+            color: #333;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .selected-numbers {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .number-badge {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            animation: fadeInScale 0.5s ease forwards;
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        @keyframes fadeInScale {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .reset-button {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s ease;
+        }
+
+        .reset-button:hover {
+            background: #7f8c8d;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .drawing-animation {
+            color: #ff6b6b;
+            font-size: 1.2rem;
+            margin: 20px 0;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 학급 청소 당번 뽑기</h1>
+        <p class="description">1번부터 30번까지 중에서<br>랜덤으로 6명을 선정합니다!</p>
+        
+        <button class="draw-button" onclick="drawNumbers()">당번 뽑기 🎲</button>
+        
+        <div class="drawing-animation hidden" id="drawingAnimation">
+            뽑는 중... 🎯
+        </div>
+        
+        <div class="results hidden" id="results">
+            <div class="result-title">🎉 선정된 청소 당번 🎉</div>
+            <div class="selected-numbers" id="selectedNumbers"></div>
+            <button class="reset-button" onclick="resetDraw()">다시 뽑기</button>
+        </div>
+    </div>
+
+    <script>
+        function drawNumbers() {
+            const drawButton = document.querySelector('.draw-button');
+            const drawingAnimation = document.getElementById('drawingAnimation');
+            const results = document.getElementById('results');
+            const selectedNumbersContainer = document.getElementById('selectedNumbers');
+            
+            // 버튼 비활성화 및 애니메이션 시작
+            drawButton.disabled = true;
+            drawButton.style.opacity = '0.6';
+            drawingAnimation.classList.remove('hidden');
+            results.classList.add('hidden');
+            
+            // 기존 결과 초기화
+            selectedNumbersContainer.innerHTML = '';
+            
+            // 1.5초 후 결과 표시
+            setTimeout(() => {
+                const numbers = [];
+                const usedNumbers = new Set();
+                
+                // 1부터 30까지 중에서 중복 없이 6개 선택
+                while (numbers.length < 6) {
+                    const randomNum = Math.floor(Math.random() * 30) + 1;
+                    if (!usedNumbers.has(randomNum)) {
+                        numbers.push(randomNum);
+                        usedNumbers.add(randomNum);
+                    }
+                }
+                
+                // 번호 정렬
+                numbers.sort((a, b) => a - b);
+                
+                // 결과 표시
+                drawingAnimation.classList.add('hidden');
+                results.classList.remove('hidden');
+                
+                // 번호 배지 생성 (애니메이션과 함께)
+                numbers.forEach((number, index) => {
+                    setTimeout(() => {
+                        const badge = document.createElement('div');
+                        badge.className = 'number-badge';
+                        badge.textContent = number;
+                        badge.style.animationDelay = `${index * 0.1}s`;
+                        selectedNumbersContainer.appendChild(badge);
+                    }, index * 200);
+                });
+                
+                // 버튼 재활성화
+                drawButton.disabled = false;
+                drawButton.style.opacity = '1';
+                
+            }, 1500);
+        }
+        
+        function resetDraw() {
+            const results = document.getElementById('results');
+            results.classList.add('hidden');
+        }
+        
+        // 엔터키로도 뽑기 가능
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                const drawButton = document.querySelector('.draw-button');
+                if (!drawButton.disabled) {
+                    drawNumbers();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
